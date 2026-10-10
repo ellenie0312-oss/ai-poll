@@ -7,7 +7,7 @@
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts (Pretendard & Inter) -->
+  <!-- Google Fonts (Pretendard) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -29,31 +29,6 @@
         extend: {
           fontFamily: {
             sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'sans-serif'],
-          },
-          colors: {
-            brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              400: '#818cf8',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-              900: '#1e1b4b',
-            }
-          },
-          keyframes: {
-            float: {
-              '0%, 100%': { transform: 'translateY(0px)' },
-              '50%': { transform: 'translateY(-6px)' },
-            },
-            pulseSubtle: {
-              '0%, 100%': { opacity: '1' },
-              '50%': { opacity: '0.6' }
-            }
-          },
-          animation: {
-            float: 'float 4s ease-in-out infinite',
-            pulseSubtle: 'pulseSubtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
           }
         }
       }
@@ -64,16 +39,19 @@
     * {
       font-family: 'Pretendard', sans-serif;
       -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
     }
     body {
-      background-color: #0f172a;
+      background-color: #0b1120;
       color: #f8fafc;
       overflow-x: hidden;
     }
-    /* Custom scrollbar */
+    .keep-all {
+      word-break: keep-all;
+    }
     ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
     }
     ::-webkit-scrollbar-track {
       background: rgba(15, 23, 42, 0.6);
@@ -82,120 +60,107 @@
       background: rgba(99, 102, 241, 0.5);
       border-radius: 9999px;
     }
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(99, 102, 241, 0.8);
-    }
-
-    /* Word Cloud SVG Text Styling */
     .word-cloud-text {
       font-weight: 800;
       cursor: pointer;
-      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
       transform-origin: center center;
     }
     .word-cloud-text:hover {
       opacity: 1 !important;
       filter: drop-shadow(0 0 14px currentColor);
     }
-    
-    /* Neon Glow Effects */
     .glow-box {
-      box-shadow: 0 0 40px -10px rgba(99, 102, 241, 0.25);
-    }
-    .glow-text {
-      text-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+      box-shadow: 0 0 35px -8px rgba(99, 102, 241, 0.25);
     }
   </style>
 </head>
 
 <body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-indigo-500 selection:text-white">
-  <header class="border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-md sticky top-0 z-40 px-4 py-3 sm:px-6">
-    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 text-white font-black text-xl">
+  <header class="border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md sticky top-0 z-40 px-3 py-2.5 sm:px-6 sm:py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 text-white font-black text-lg sm:text-xl">
           ☁️
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="font-extrabold text-lg sm:text-xl tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent">
+            <h1 class="font-extrabold text-base sm:text-xl tracking-tight text-white">
               실시간 워드 클라우드
             </h1>
-            <span id="connection-status" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              실시간 연결됨
+            <span id="connection-status" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/30">
+              <span id="conn-dot" class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+              <span id="conn-text">클라우드 연결 중...</span>
             </span>
           </div>
-          <p class="text-xs text-slate-400 hidden sm:block">QR을 스캔하여 교육생들과 실시간으로 키워드를 공유하세요</p>
+          <p class="text-[11px] text-slate-400 hidden sm:block">QR을 스캔하여 교육생들과 최대 50개의 키워드를 실시간 공유하세요</p>
         </div>
       </div>
 
-      <!-- View Selector & Action Buttons -->
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5 sm:gap-2">
         <div class="bg-slate-800/90 p-1 rounded-xl flex items-center border border-slate-700/80">
-          <button id="nav-screen-btn" onclick="switchView('screen')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-indigo-600 text-white shadow">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-            <span class="hidden md:inline">진행자 화면</span>(스크린)
+          <button id="nav-screen-btn" onclick="switchView('screen')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-indigo-600 text-white shadow">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            <span class="hidden md:inline">진행자</span> 화면
           </button>
-          <button id="nav-student-btn" onclick="switchView('student')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-            <span class="hidden md:inline">교육생 화면</span>(모바일)
+          <button id="nav-student-btn" onclick="switchView('student')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 text-slate-300 hover:text-white">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+            <span class="hidden md:inline">교육생</span> 모바일
           </button>
         </div>
 
-        <button onclick="openSettingsModal()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white transition title='설문 설정'">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <button onclick="openSettingsModal()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white transition" title="설문 설정">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
         </button>
 
-        <button onclick="toggleFullScreen()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white transition title='전체화면'">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0 0l-5-5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+        <button onclick="toggleFullScreen()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white transition" title="전체화면">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0 0l-5-5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
         </button>
       </div>
     </div>
   </header>
 
   <main id="view-screen" class="flex-1 flex flex-col p-3 sm:p-6 max-w-[1600px] w-full mx-auto gap-4">
-    <!-- Question Topic Banner -->
-    <div class="bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-indigo-500/30 rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-      <div class="space-y-1">
+    <!-- Topic Title Banner -->
+    <div class="bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-indigo-500/30 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="space-y-1 max-w-3xl">
         <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
           💡 오늘 설문 주제
         </div>
-        <h2 id="screen-question-title" class="text-xl sm:text-2xl md:text-3xl font-extrabold text-white tracking-tight">
-          우리 부서에서 반복되는 업무 중 AI로 개선하고 싶은 것은 무엇일까요?
+        <h2 id="screen-question-title" class="text-lg sm:text-2xl md:text-3xl font-extrabold text-white tracking-tight keep-all leading-snug">
+          "우리 부서에서 반복되는 업무 중 AI로 개선하고 싶은 것은 무엇일까요?"
         </h2>
-        <p id="screen-question-desc" class="text-xs sm:text-sm text-slate-400">스마트폰으로 우측 QR 코드를 스캔하여 단어를 남겨주세요 (1인당 여러 번 제출 가능)</p>
+        <p id="screen-question-desc" class="text-xs sm:text-sm text-slate-400">스마트폰으로 우측 QR 코드를 스캔하여 단어를 제출하세요 (최대 50개 키워드 실시간 수집)</p>
       </div>
 
       <!-- Quick Metrics Counters -->
-      <div class="flex items-center gap-3 sm:gap-4 w-full md:w-auto justify-between md:justify-end">
-        <div class="bg-slate-900/90 border border-slate-800 px-4 py-2.5 rounded-xl text-center min-w-[90px]">
-          <span class="block text-xs text-slate-400 font-medium">참여 인원</span>
-          <span id="metric-participants" class="text-2xl font-black text-emerald-400">0</span>
+      <div class="flex items-center gap-2.5 sm:gap-4 w-full md:w-auto justify-between md:justify-end">
+        <div class="bg-slate-900/90 border border-slate-800 px-3.5 py-2 rounded-xl text-center min-w-[80px]">
+          <span class="block text-[11px] text-slate-400 font-medium">참여 인원</span>
+          <span id="metric-participants" class="text-xl sm:text-2xl font-black text-emerald-400">0</span>
         </div>
-        <div class="bg-slate-900/90 border border-slate-800 px-4 py-2.5 rounded-xl text-center min-w-[90px]">
-          <span class="block text-xs text-slate-400 font-medium">제출 단어</span>
-          <span id="metric-total-words" class="text-2xl font-black text-indigo-400">0</span>
+        <div class="bg-slate-900/90 border border-slate-800 px-3.5 py-2 rounded-xl text-center min-w-[80px]">
+          <span class="block text-[11px] text-slate-400 font-medium">수집 단어</span>
+          <span id="metric-total-words" class="text-xl sm:text-2xl font-black text-indigo-400">0/50</span>
         </div>
-        <div class="bg-slate-900/90 border border-slate-800 px-4 py-2.5 rounded-xl text-center min-w-[90px]">
-          <span class="block text-xs text-slate-400 font-medium">고유 키워드</span>
-          <span id="metric-unique-words" class="text-2xl font-black text-amber-400">0</span>
+        <div class="bg-slate-900/90 border border-slate-800 px-3.5 py-2 rounded-xl text-center min-w-[80px]">
+          <span class="block text-[11px] text-slate-400 font-medium">고유 키워드</span>
+          <span id="metric-unique-words" class="text-xl sm:text-2xl font-black text-amber-400">0</span>
         </div>
       </div>
     </div>
 
-    <div class="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-4 min-h-[520px]">
-      <!-- Word Cloud Canvas Card (Spans 3 cols on desktop) -->
+    <div class="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-4 min-h-[500px]">
       <div class="lg:col-span-3 bg-slate-900/90 border border-slate-800 rounded-3xl p-4 flex flex-col relative overflow-hidden glow-box">
-        <!-- Control Header for Word Cloud -->
         <div class="flex items-center justify-between pb-3 border-b border-slate-800/80 z-10 px-2">
           <div class="flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-            <span class="text-sm font-bold text-slate-300">워드 클라우드 캔버스</span>
+            <span class="text-sm font-bold text-slate-300">실시간 워드 클라우드 캔버스</span>
             <span id="rendering-indicator" class="text-xs text-slate-400 hidden">(생성 중...)</span>
           </div>
           <div class="flex items-center gap-2">
             <button onclick="injectDemoResponses()" class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition flex items-center gap-1 font-medium">
-              <span>⚡ 예시 데이터 채우기</span>
+              <span>⚡ 20명 예시 데이터</span>
             </button>
             <button onclick="resetAllDataConfirmation()" class="text-xs px-2.5 py-1.5 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 transition flex items-center gap-1 font-medium">
               <span>🗑️ 초기화</span>
@@ -203,19 +168,17 @@
           </div>
         </div>
 
-        <!-- SVG Visualizer Container -->
-        <div id="wordcloud-container" class="flex-1 w-full h-[450px] md:h-[580px] relative flex items-center justify-center">
+        <div id="wordcloud-container" class="flex-1 w-full h-[430px] md:h-[550px] relative flex items-center justify-center">
           <div id="empty-state" class="text-center p-8 z-10">
-            <div class="w-16 h-16 mx-auto mb-3 text-slate-600 animate-float">
+            <div class="w-16 h-16 mx-auto mb-3 text-slate-600">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
             </div>
             <h3 class="text-lg font-bold text-slate-300">아직 제출된 단어가 없습니다</h3>
-            <p class="text-sm text-slate-500 mt-1 max-w-sm mx-auto">우측의 QR 코드를 스캔하거나 상단 '예시 데이터 채우기' 버튼을 눌러보세요.</p>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-sm mx-auto">우측 QR 코드를 스캔하거나 '20명 예시 데이터' 버튼을 눌러보세요.</p>
           </div>
           <svg id="wordcloud-svg" class="w-full h-full absolute inset-0"></svg>
         </div>
 
-        <!-- Floating Live Ticker at bottom -->
         <div class="pt-2 px-2 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
           <div class="flex items-center gap-2 overflow-hidden">
             <span class="text-indigo-400 font-bold whitespace-nowrap">방금 들어온 단어:</span>
@@ -228,47 +191,41 @@
       </div>
 
       <div class="lg:col-span-1 flex flex-col gap-4">
-        <!-- QR Code Card for Presenting -->
-        <div class="bg-gradient-to-b from-indigo-950/40 via-slate-900 to-slate-900 border border-indigo-500/30 rounded-3xl p-5 flex flex-col items-center text-center shadow-xl relative overflow-hidden">
-          <div class="absolute -top-12 -right-12 w-28 h-28 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
-          
-          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 mb-3 border border-indigo-500/30">
+        <!-- QR Code Card -->
+        <div class="bg-gradient-to-b from-indigo-950/40 via-slate-900 to-slate-900 border border-indigo-500/30 rounded-3xl p-4 sm:p-5 flex flex-col items-center text-center shadow-xl relative overflow-hidden">
+          <div class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 mb-2 border border-indigo-500/30">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
             스마트폰 카메라로 스캔
           </div>
+          <h3 class="font-extrabold text-base sm:text-lg text-white mb-1">지금 바로 참여하기</h3>
+          <p class="text-[11px] text-slate-400 mb-3">별도 앱 없이 카메라로 비추면 바로 열립니다</p>
 
-          <h3 class="font-black text-lg text-white mb-1">지금 바로 참여하기</h3>
-          <p class="text-xs text-slate-400 mb-4">별도 앱 설치 없이 카메라로 비추면 바로 설문 페이지로 연결됩니다</p>
-
-          <!-- QR Code Canvas Display -->
-          <div class="p-3 bg-white rounded-2xl shadow-2xl mb-3 border-2 border-indigo-400/40 transform hover:scale-105 transition duration-300 flex items-center justify-center min-h-[190px] min-w-[190px]">
-            <div id="qrcode-container" class="w-[180px] h-[180px] flex items-center justify-center"></div>
+          <div class="p-2.5 bg-white rounded-2xl shadow-xl mb-3 border-2 border-indigo-400/40 flex items-center justify-center min-h-[175px] min-w-[175px]">
+            <div id="qrcode-container" class="w-[165px] h-[165px] flex items-center justify-center"></div>
           </div>
 
-          <!-- Direct URL Copy & Custom URL Config -->
-          <div class="w-full space-y-2">
+          <div class="w-full space-y-1.5">
             <div class="w-full flex items-center gap-1 bg-slate-950/80 p-1.5 rounded-xl border border-slate-800 text-xs">
-              <input id="share-url-input" type="text" readonly class="bg-transparent text-slate-300 flex-1 px-2 focus:outline-none text-center select-all truncate text-[11px]" />
-              <button onclick="copyParticipantLink()" id="copy-btn" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold text-[11px] whitespace-nowrap transition">
+              <input id="share-url-input" type="text" readonly class="bg-transparent text-slate-300 flex-1 px-1.5 focus:outline-none text-center select-all truncate text-[11px]" />
+              <button onclick="copyParticipantLink()" id="copy-btn" class="px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold text-[11px] transition">
                 복사
               </button>
             </div>
-            <button onclick="promptCustomUrl()" class="w-full py-1 text-[11px] text-slate-400 hover:text-indigo-300 flex items-center justify-center gap-1 transition">
-              <span>🔗 배포한 웹 주소로 QR 변경</span>
+            <button onclick="promptCustomUrl()" class="w-full py-1 text-[11px] text-indigo-400 hover:text-indigo-300 font-medium transition">
+              🔗 배포 웹 주소 직접 입력
             </button>
           </div>
         </div>
 
-        <!-- Top Ranking Keywords Card -->
-        <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 flex-1 flex flex-col min-h-[220px]">
-          <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-            <h4 class="font-bold text-sm text-slate-200 flex items-center gap-1.5">
+        <!-- TOP 5 Ranking Card -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 flex-1 flex flex-col min-h-[200px]">
+          <div class="flex items-center justify-between pb-2.5 border-b border-slate-800">
+            <h4 class="font-bold text-xs sm:text-sm text-slate-200 flex items-center gap-1.5">
               <span>🏆</span> 최다 응답 키워드 TOP 5
             </h4>
             <span class="text-[11px] text-slate-400">빈도수 순</span>
           </div>
-
-          <div id="top-keywords-list" class="space-y-2 mt-3 flex-1 overflow-y-auto max-h-[260px] pr-1">
+          <div id="top-keywords-list" class="space-y-2 mt-2.5 flex-1 overflow-y-auto max-h-[240px] pr-1">
             <div class="text-xs text-slate-500 text-center py-6">제출된 데이터가 없습니다</div>
           </div>
         </div>
@@ -276,38 +233,36 @@
     </div>
   </main>
 
-  <main id="view-student" class="hidden flex-1 flex flex-col p-4 sm:p-6 max-w-lg w-full mx-auto justify-center">
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 glow-box">
-      <!-- Top Topic Header -->
+  <main id="view-student" class="hidden flex-1 flex flex-col p-4 sm:p-6 max-w-md w-full mx-auto justify-center">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-7 shadow-2xl space-y-5 glow-box">
       <div class="text-center space-y-2">
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-          📱 교육생 참여 모드
+        <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+          📱 교육생 설문 참여
         </div>
-        <h2 id="student-question-title" class="text-2xl font-black text-white leading-snug">
-          우리 부서에서 반복되는 업무 중 AI로 개선하고 싶은 것은 무엇일까요?
+        <h2 id="student-question-title" class="text-base sm:text-lg font-extrabold text-white keep-all leading-snug px-1">
+          "우리 부서에서 반복되는 업무 중 AI로 개선하고 싶은 것은 무엇일까요?"
         </h2>
-        <p id="student-question-desc" class="text-xs text-slate-400">
-          생각나는 업무나 키워드를 입력하고 전송을 눌러주세요!
+        <p id="student-question-desc" class="text-xs text-slate-400 keep-all">
+          개선하고 싶은 업무나 키워드를 입력하고 전송을 눌러주세요! (최대 50개까지 수집)
         </p>
       </div>
 
-      <!-- Submission Form -->
       <form id="submission-form" onsubmit="handleWordSubmit(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-bold text-slate-300 mb-1.5">
-            키워드 또는 단어 입력 (최대 25자)
+            키워드 또는 단어 입력 (최대 20자)
           </label>
           <div class="relative">
             <input 
               id="word-input" 
               type="text" 
-              maxlength="25" 
-              placeholder="예: 클라우드, 인공지능, 프롬프트..." 
+              maxlength="20" 
+              placeholder="예: 회의록 정리, 엑셀 취합, 보고서 초안..." 
               autocomplete="off"
               required
               class="w-full px-4 py-3.5 rounded-2xl bg-slate-950 border-2 border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 text-base font-semibold transition"
             />
-            <span id="char-counter" class="absolute right-3.5 bottom-3.5 text-xs text-slate-500 pointer-events-none">0/25</span>
+            <span id="char-counter" class="absolute right-3.5 bottom-3.5 text-xs text-slate-500 pointer-events-none">0/20</span>
           </div>
         </div>
 
@@ -316,31 +271,30 @@
           id="submit-btn" 
           class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-extrabold text-base shadow-lg shadow-indigo-600/30 active:scale-[0.98] transition flex items-center justify-center gap-2"
         >
-          <span>🚀 워드 클라우드로 전송하기</span>
+          <span>🚀 실시간 전송하기</span>
         </button>
       </form>
 
-      <!-- Submitted Words List for current student -->
-      <div class="border-t border-slate-800 pt-4">
+      <div class="border-t border-slate-800 pt-3.5">
         <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
-          <span class="font-bold text-slate-300">내가 방금 제출한 단어들</span>
+          <span class="font-bold text-slate-300">내가 제출한 단어 목록</span>
           <span id="my-submit-count" class="font-semibold text-indigo-400">총 0개 제출</span>
         </div>
-        <div id="my-submissions-tags" class="flex flex-wrap gap-2 min-h-[38px] p-2 rounded-xl bg-slate-950/60 border border-slate-800/80">
+        <div id="my-submissions-tags" class="flex flex-wrap gap-1.5 min-h-[38px] p-2 rounded-xl bg-slate-950/60 border border-slate-800/80 max-h-32 overflow-y-auto">
           <span class="text-xs text-slate-600 italic">아직 제출한 단어가 없습니다.</span>
         </div>
       </div>
 
-      <div class="text-center pt-2">
+      <div class="text-center pt-1">
         <button onclick="switchView('screen')" class="text-xs text-slate-400 hover:text-indigo-400 underline transition">
-          대형 스크린 워드 클라우드 화면으로 전환하기
+          진행자 워드 클라우드 화면 보기
         </button>
       </div>
     </div>
   </main>
 
   <div id="settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <h3 class="text-lg font-black text-white flex items-center gap-2">
           <span>⚙️</span> 설문조사 설정
@@ -350,7 +304,7 @@
         </button>
       </div>
 
-      <div class="space-y-4">
+      <div class="space-y-3.5">
         <div>
           <label class="block text-xs font-bold text-slate-300 mb-1">설문 질문 제목</label>
           <input id="edit-question-title" type="text" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white focus:outline-none focus:border-indigo-500 text-sm font-medium" />
@@ -384,6 +338,7 @@
     </div>
   </div>
 
+  <!-- Toast Notification -->
   <div id="toast" class="fixed bottom-6 right-6 z-50 bg-indigo-600 text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2 transform translate-y-24 opacity-0 transition duration-300 pointer-events-none text-sm font-bold border border-indigo-400/40">
     <span id="toast-icon">✨</span>
     <span id="toast-msg">메시지</span>
@@ -391,233 +346,150 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, collection, onSnapshot, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, collection, onSnapshot, setDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // Application state
-    window.appState = {
-      appId: typeof __app_id !== 'undefined' ? __app_id : 'wordcloud-poll-demo',
-      question: {
-        title: '우리 부서에서 반복되는 업무 중 AI로 개선하고 싶은 것은 무엇일까요?',
-        desc: '스마트폰으로 우측 QR 코드를 스캔하여 단어를 남겨주세요 (1인당 여러 번 제출 가능)'
-      },
-      words: [], // Array of { id, text, count, timestamp, userId }
-      colorTheme: 'vibrant',
-      currentView: 'screen', // 'screen' or 'student'
-      localSubmissions: [],
-      myUserId: null,
-      useFirestore: false,
-      firestoreDb: null,
-      firestoreAuth: null,
+    const firebaseConfig = {
+      apiKey: "AIzaSyBnDFkyZyXu8ULCp3NC2txEJCJhyUAzR30",
+      authDomain: "ai-poll-ec1d4.firebaseapp.com",
+      projectId: "ai-poll-ec1d4",
+      storageBucket: "ai-poll-ec1d4.firebasestorage.app",
+      messagingSenderId: "749622940274",
+      appId: "1:749622940274:web:87c930e2f67aff38a268eb",
+      measurementId: "G-JCRTN9YWKS"
     };
 
-    async function initDatabase() {
-      // Check if global Firebase configuration is present
-      if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-        try {
-          const config = JSON.parse(__firebase_config);
-          const app = initializeApp(config);
-          const auth = getAuth(app);
-          const db = getFirestore(app);
-
-          // Authenticate following Rule 3
-          if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-            await signInWithCustomToken(auth, __initial_auth_token);
-          } else {
-            await signInAnonymously(auth);
-          }
-
-          window.appState.firestoreDb = db;
-          window.appState.firestoreAuth = auth;
-          window.appState.myUserId = auth.currentUser?.uid || 'user-' + Math.random().toString(36).substring(2, 9);
-          window.appState.useFirestore = true;
-
-          // Subscribe to words collection using strict public path (Rule 1 & Rule 2)
-          const wordsColl = collection(db, 'artifacts', window.appState.appId, 'public', 'data', 'words');
-          onSnapshot(wordsColl, (snapshot) => {
-            const list = [];
-            snapshot.forEach((docSnap) => {
-              list.push({ id: docSnap.id, ...docSnap.data() });
-            });
-            window.appState.words = list;
-            if (typeof window.renderAllViews === 'function') {
-              window.renderAllViews();
-            }
-          }, (err) => {
-            console.error("Firestore onSnapshot error:", err);
-            // Fallback to local
-            setupLocalBroadcasting();
-          });
-
-          // Subscribe to poll config
-          const configDocRef = doc(db, 'artifacts', window.appState.appId, 'public', 'data', 'config', 'pollConfig');
-          onSnapshot(configDocRef, (docSnap) => {
-            if (docSnap.exists()) {
-              const data = docSnap.data();
-              if (data.title) window.appState.question.title = data.title;
-              if (data.desc) window.appState.question.desc = data.desc;
-              if (data.colorTheme) window.appState.colorTheme = data.colorTheme;
-              if (typeof window.updateQuestionUI === 'function') window.updateQuestionUI();
-              if (typeof window.renderWordCloud === 'function') window.renderWordCloud();
-            }
-          }, (err) => console.warn("Config doc snapshot error:", err));
-
-          showToast("클라우드 실시간 동기화가 활성화되었습니다!", "☁️");
-        } catch (e) {
-          console.warn("Failed to initialize Firebase, falling back to local BroadcastChannel:", e);
-          setupLocalBroadcasting();
-        }
-      } else {
-        setupLocalBroadcasting();
-      }
+    let storedUserId = localStorage.getItem('ai_poll_uid');
+    if (!storedUserId) {
+      storedUserId = 'u_' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+      localStorage.setItem('ai_poll_uid', storedUserId);
     }
 
-    function setupLocalBroadcasting() {
-      window.appState.useFirestore = false;
-      window.appState.myUserId = 'local-user-' + Math.random().toString(36).substring(2, 8);
-      
-      // Load from memory or localStorage fallback
+    window.appState = {
+      appId: 'ai-poll-session',
+      maxCapacity: 50,
+      question: {
+        title: '"우리 부서에서 반복되는 업무 중 AI로 개선하고 싶은 것은 무엇일까요?"',
+        desc: '스마트폰으로 우측 QR 코드를 스캔하여 단어를 제출하세요 (최대 50개 키워드 실시간 수집)'
+      },
+      words: [],
+      colorTheme: 'vibrant',
+      currentView: 'screen',
+      localSubmissions: [],
+      myUserId: storedUserId,
+      db: null
+    };
+
+    async function initFirebase() {
       try {
-        const cached = localStorage.getItem(`wordcloud_words_${window.appState.appId}`);
-        if (cached) window.appState.words = JSON.parse(cached);
-      } catch (e) {}
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        window.appState.db = db;
 
-      // Cross-tab / cross-window sync
-      if ('BroadcastChannel' in window) {
-        window.syncChannel = new BroadcastChannel(`wordcloud_sync_${window.appState.appId}`);
-        window.syncChannel.onmessage = (event) => {
-          if (event.data?.type === 'UPDATE_WORDS') {
-            window.appState.words = event.data.words;
-            if (typeof window.renderAllViews === 'function') window.renderAllViews();
-          } else if (event.data?.type === 'UPDATE_CONFIG') {
-            window.appState.question = event.data.question;
-            window.appState.colorTheme = event.data.colorTheme;
-            if (typeof window.updateQuestionUI === 'function') window.updateQuestionUI();
-            if (typeof window.renderWordCloud === 'function') window.renderWordCloud();
+        updateNetworkBadge(true, "클라우드 실시간 동기화됨");
+
+        const wordsColl = collection(db, 'artifacts', window.appState.appId, 'public', 'data', 'words');
+        onSnapshot(wordsColl, (snapshot) => {
+          const list = [];
+          snapshot.forEach((d) => {
+            list.push({ id: d.id, ...d.data() });
+          });
+          window.appState.words = list;
+          window.renderAllViews();
+        }, (err) => {
+          console.warn("Firestore snapshot notice:", err);
+          if (err.code === 'permission-denied') {
+            updateNetworkBadge(false, "Firestore 규칙 확인 필요");
+            showToast("Firestore 규칙에서 'allow read, write: if true;'를 확인하세요.", "⚠️");
+          } else {
+            updateNetworkBadge(false, "연결 대기 중");
           }
-        };
-      }
-      if (typeof window.renderAllViews === 'function') {
-        window.renderAllViews();
+        });
+
+      } catch (err) {
+        console.error("Firebase init failed:", err);
+        updateNetworkBadge(false, "로컬 모드로 동작");
       }
     }
 
-    // Export submit action to global window
     window.dbSubmitWord = async function(cleanText) {
-      if (window.appState.useFirestore && window.appState.firestoreDb) {
-        try {
-          const db = window.appState.firestoreDb;
-          // Document ID sanitized
-          const docId = encodeURIComponent(cleanText.toLowerCase());
-          const docRef = doc(db, 'artifacts', window.appState.appId, 'public', 'data', 'words', docId);
-          
-          // Find existing
-          const existing = window.appState.words.find(w => w.text.toLowerCase() === cleanText.toLowerCase());
-          const newCount = (existing ? existing.count : 0) + 1;
-          const contributors = existing && Array.isArray(existing.contributors) ? existing.contributors : [];
-          if (!contributors.includes(window.appState.myUserId)) {
-            contributors.push(window.appState.myUserId);
-          }
+      if (!window.appState.db) {
+        window.submitWordLocally(cleanText);
+        return;
+      }
 
-          await setDoc(docRef, {
-            text: cleanText,
-            count: newCount,
-            contributors: contributors,
-            updatedAt: Date.now()
-          }, { merge: true });
-        } catch (err) {
-          console.error("Firestore submit error:", err);
-          window.submitWordLocally(cleanText);
+      try {
+        const db = window.appState.db;
+        const activeWords = window.appState.words.filter(w => w.count > 0);
+        const existing = activeWords.find(w => w.text.toLowerCase() === cleanText.toLowerCase());
+
+        if (!existing && activeWords.length >= window.appState.maxCapacity) {
+          showToast(`최대 ${window.appState.maxCapacity}개의 키워드가 이미 수집되었습니다.`, "⚠️");
+          return;
         }
-      } else {
+
+        const safeDocId = encodeURIComponent(cleanText.toLowerCase().replace(/[\.\#\$\[\]\/]/g, '_'));
+        const docRef = doc(db, 'artifacts', window.appState.appId, 'public', 'data', 'words', safeDocId);
+
+        const newCount = (existing ? existing.count : 0) + 1;
+        const contributors = existing && Array.isArray(existing.contributors) ? [...existing.contributors] : [];
+        if (!contributors.includes(window.appState.myUserId)) {
+          contributors.push(window.appState.myUserId);
+        }
+
+        await setDoc(docRef, {
+          text: cleanText,
+          count: newCount,
+          contributors: contributors,
+          updatedAt: Date.now()
+        }, { merge: true });
+
+      } catch (err) {
+        console.error("Word submit failed, fallback to local:", err);
         window.submitWordLocally(cleanText);
       }
     };
 
-    window.dbUpdateConfig = async function(title, desc, colorTheme) {
-      if (window.appState.useFirestore && window.appState.firestoreDb) {
-        try {
-          const db = window.appState.firestoreDb;
-          const configDocRef = doc(db, 'artifacts', window.appState.appId, 'public', 'data', 'config', 'pollConfig');
-          await setDoc(configDocRef, {
-            title: title,
-            desc: desc,
-            colorTheme: colorTheme,
-            updatedAt: Date.now()
-          }, { merge: true });
-        } catch (e) {
-          console.error("Config save error:", e);
-        }
-      }
-      if (window.syncChannel) {
-        window.syncChannel.postMessage({
-          type: 'UPDATE_CONFIG',
-          question: window.appState.question,
-          colorTheme: window.appState.colorTheme
-        });
-      }
-    };
-
     window.dbResetAll = async function() {
-      if (window.appState.useFirestore && window.appState.firestoreDb) {
-        try {
-          const db = window.appState.firestoreDb;
-          const wordsColl = collection(db, 'artifacts', window.appState.appId, 'public', 'data', 'words');
-          const snapshot = await getDocs(wordsColl);
-          const deletes = snapshot.docs.map(d => setDoc(doc(db, 'artifacts', window.appState.appId, 'public', 'data', 'words', d.id), { count: 0, contributors: [] }));
-          await Promise.all(deletes);
-        } catch (e) {
-          console.error("Reset error:", e);
-        }
+      if (!window.appState.db) {
+        window.appState.words = [];
+        window.renderAllViews();
+        return;
       }
-      window.appState.words = [];
-      try { localStorage.removeItem(`wordcloud_words_${window.appState.appId}`); } catch(e){}
-      if (window.syncChannel) {
-        window.syncChannel.postMessage({ type: 'UPDATE_WORDS', words: [] });
+
+      try {
+        const db = window.appState.db;
+        const wordsColl = collection(db, 'artifacts', window.appState.appId, 'public', 'data', 'words');
+        const snap = await getDocs(wordsColl);
+        const deletePromises = snap.docs.map(d => deleteDoc(doc(db, 'artifacts', window.appState.appId, 'public', 'data', 'words', d.id)));
+        await Promise.all(deletePromises);
+        window.appState.words = [];
+        window.renderAllViews();
+      } catch (err) {
+        console.error("Reset error:", err);
       }
-      window.renderAllViews();
     };
 
-    // Initialize once module is ready
-    initDatabase();
+    initFirebase();
   </script>
 
   <script>
-    // Color palettes for Word Cloud
     const COLOR_PALETTES = {
-      vibrant: ['#6366f1', '#a855f7', '#ec4899', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6'],
+      vibrant: ['#818cf8', '#a855f7', '#ec4899', '#38bdf8', '#06b6d4', '#10b981', '#f59e0b', '#f43f5e', '#c084fc'],
       pastel: ['#93c5fd', '#c4b5fd', '#f9a8d4', '#6ee7b7', '#fde047', '#fca5a5', '#a5b4fc', '#5eead4'],
       ocean: ['#38bdf8', '#0284c7', '#06b6d4', '#0d9488', '#2dd4bf', '#60a5fa', '#1d4ed8'],
       sunset: ['#fb923c', '#f97316', '#ea580c', '#e11d48', '#be185d', '#831843', '#f43f5e', '#fbbf24']
     };
 
-    function switchView(view) {
-      window.appState.currentView = view;
-      const screenView = document.getElementById('view-screen');
-      const studentView = document.getElementById('view-student');
-      const btnScreen = document.getElementById('nav-screen-btn');
-      const btnStudent = document.getElementById('nav-student-btn');
-
-      if (view === 'screen') {
-        screenView.classList.remove('hidden');
-        studentView.classList.add('hidden');
-        
-        btnScreen.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-indigo-600 text-white shadow";
-        btnStudent.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white";
-        // Resize and re-render word cloud
-        setTimeout(() => window.renderWordCloud(), 100);
-      } else {
-        screenView.classList.add('hidden');
-        studentView.classList.remove('hidden');
-
-        btnStudent.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-indigo-600 text-white shadow";
-        btnScreen.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-300 hover:text-white";
-        
-        // Focus input on mobile view
-        setTimeout(() => {
-          const input = document.getElementById('word-input');
-          if (input) input.focus();
-        }, 150);
+    function updateNetworkBadge(online, msg) {
+      const text = document.getElementById('conn-text');
+      const dot = document.getElementById('conn-dot');
+      if (text) text.textContent = msg;
+      if (dot) {
+        if (online) {
+          dot.className = "w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse";
+        } else {
+          dot.className = "w-1.5 h-1.5 rounded-full bg-amber-400";
+        }
       }
     }
 
@@ -625,9 +497,6 @@
       const existing = window.appState.words.find(w => w.text.toLowerCase() === cleanText.toLowerCase());
       if (existing) {
         existing.count += 1;
-        if (!existing.contributors.includes(window.appState.myUserId)) {
-          existing.contributors.push(window.appState.myUserId);
-        }
         existing.updatedAt = Date.now();
       } else {
         window.appState.words.push({
@@ -638,48 +507,31 @@
           updatedAt: Date.now()
         });
       }
-
-      try {
-        localStorage.setItem(`wordcloud_words_${window.appState.appId}`, JSON.stringify(window.appState.words));
-      } catch (e) {}
-
-      if (window.syncChannel) {
-        window.syncChannel.postMessage({
-          type: 'UPDATE_WORDS',
-          words: window.appState.words
-        });
-      }
-
       window.renderAllViews();
     };
 
     function handleWordSubmit(e) {
       e.preventDefault();
       const input = document.getElementById('word-input');
-      const rawText = input.value.trim();
+      const raw = input.value.trim();
+      if (!raw) return;
 
-      if (!rawText) return;
-
-      // Clean string (limit length, remove special markdown)
-      const cleanText = rawText.replace(/[\<\>\/\\\{\}\^]/g, '').slice(0, 25);
+      const cleanText = raw.replace(/[\<\>\/\\\{\}\^]/g, '').slice(0, 20);
       if (!cleanText) return;
 
-      // Call database or fallback
       if (window.dbSubmitWord) {
         window.dbSubmitWord(cleanText);
       } else {
         window.submitWordLocally(cleanText);
       }
 
-      // Add to personal local list
       window.appState.localSubmissions.unshift(cleanText);
       updateMySubmissionsUI();
 
-      // Confetti burst on successful submission
       if (typeof confetti === 'function') {
         confetti({
-          particleCount: 45,
-          spread: 60,
+          particleCount: 35,
+          spread: 55,
           origin: { y: 0.8 },
           colors: ['#6366f1', '#a855f7', '#ec4899', '#38bdf8']
         });
@@ -687,49 +539,49 @@
 
       showToast(`'${cleanText}' 전송 완료!`, "🚀");
       input.value = '';
-      document.getElementById('char-counter').textContent = '0/25';
+      document.getElementById('char-counter').textContent = '0/20';
       input.focus();
     }
 
     window.renderAllViews = function() {
       const activeWords = window.appState.words.filter(w => w.count > 0);
-      
-      // Calculate metrics
       const totalWords = activeWords.reduce((sum, w) => sum + w.count, 0);
       const uniqueWords = activeWords.length;
       
-      // Estimate unique participants
       const participantSet = new Set();
       activeWords.forEach(w => {
         if (Array.isArray(w.contributors)) {
           w.contributors.forEach(uid => participantSet.add(uid));
         }
       });
-      // Fallback participant estimation if single-browser testing
-      const participantCount = Math.max(participantSet.size, activeWords.length > 0 ? Math.min(20, Math.ceil(totalWords / 2.5)) : 0);
+      const participants = Math.max(participantSet.size, uniqueWords > 0 ? Math.min(25, Math.ceil(totalWords / 2)) : 0);
 
-      document.getElementById('metric-total-words').textContent = totalWords;
-      document.getElementById('metric-unique-words').textContent = uniqueWords;
-      document.getElementById('metric-participants').textContent = participantCount;
+      const totalWordsEl = document.getElementById('metric-total-words');
+      const uniqueWordsEl = document.getElementById('metric-unique-words');
+      const participantsEl = document.getElementById('metric-participants');
 
-      // Update Recent Ticker
+      if (totalWordsEl) totalWordsEl.textContent = `${totalWords}/${window.appState.maxCapacity}`;
+      if (uniqueWordsEl) uniqueWordsEl.textContent = uniqueWords;
+      if (participantsEl) participantsEl.textContent = participants;
+
       const ticker = document.getElementById('recent-words-ticker');
-      if (activeWords.length > 0) {
-        const sortedByTime = [...activeWords].sort((a,b) => (b.updatedAt || 0) - (a.updatedAt || 0));
-        ticker.textContent = sortedByTime.slice(0, 5).map(w => `${w.text} (${w.count})`).join('  •  ');
-      } else {
-        ticker.textContent = '대기 중...';
+      if (ticker) {
+        if (activeWords.length > 0) {
+          const sortedTime = [...activeWords].sort((a,b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+          ticker.textContent = sortedTime.slice(0, 5).map(w => `${w.text} (${w.count})`).join('  •  ');
+        } else {
+          ticker.textContent = '대기 중...';
+        }
       }
 
-      // Update Top Ranking List
       renderTopKeywords(activeWords, totalWords);
-
-      // Render Cloud
       window.renderWordCloud();
     };
 
     function renderTopKeywords(activeWords, totalWords) {
       const container = document.getElementById('top-keywords-list');
+      if (!container) return;
+
       if (!activeWords.length) {
         container.innerHTML = `<div class="text-xs text-slate-500 text-center py-6">제출된 데이터가 없습니다</div>`;
         return;
@@ -769,34 +621,32 @@
       const emptyState = document.getElementById('empty-state');
       const indicator = document.getElementById('rendering-indicator');
 
+      if (!container || !svgEl) return;
+
       const activeWords = window.appState.words.filter(w => w.count > 0);
 
       if (activeWords.length === 0) {
         svgEl.innerHTML = '';
-        emptyState.classList.remove('hidden');
+        if (emptyState) emptyState.classList.remove('hidden');
         return;
       }
-      emptyState.classList.add('hidden');
+      if (emptyState) emptyState.classList.add('hidden');
 
-      // Clear any pending layout
       if (cloudLayoutTimeout) clearTimeout(cloudLayoutTimeout);
 
       cloudLayoutTimeout = setTimeout(() => {
-        indicator.classList.remove('hidden');
+        if (indicator) indicator.classList.remove('hidden');
         const width = container.clientWidth || 800;
-        const height = container.clientHeight || 500;
+        const height = container.clientHeight || 520;
 
-        // Clear previous SVG
         d3.select(svgEl).selectAll("*").remove();
 
-        // Calculate font scale based on frequencies
         const counts = activeWords.map(d => d.count);
         const minCount = Math.min(...counts);
         const maxCount = Math.max(...counts);
 
-        // Responsive font size range
-        const minFontSize = width < 600 ? 16 : 22;
-        const maxFontSize = width < 600 ? 54 : 88;
+        const minFontSize = width < 600 ? 14 : 18;
+        const maxFontSize = width < 600 ? 44 : (activeWords.length > 25 ? 60 : 76);
 
         const fontScale = d3.scaleSqrt()
           .domain([minCount, Math.max(minCount + 1, maxCount)])
@@ -804,7 +654,6 @@
 
         const palette = COLOR_PALETTES[window.appState.colorTheme] || COLOR_PALETTES.vibrant;
 
-        // Prepare words for d3-cloud
         const wordsForLayout = activeWords.map((d, i) => ({
           text: d.text,
           size: fontScale(d.count),
@@ -812,25 +661,24 @@
           color: palette[i % palette.length]
         }));
 
-        // Initialize d3-cloud layout
         d3.layout.cloud()
           .size([width, height])
           .words(wordsForLayout)
-          .padding(5)
-          .rotate(() => 0) // Keep text horizontally readable for easy classroom projector view
+          .padding(4)
+          .rotate(() => 0)
           .font("Pretendard")
           .fontSize(d => d.size)
           .on("end", draw)
           .start();
 
         function draw(words) {
-          indicator.classList.add('hidden');
+          if (indicator) indicator.classList.add('hidden');
           const svg = d3.select(svgEl)
             .attr("viewBox", `0 0 ${width} ${height}`)
             .append("g")
             .attr("transform", `translate(${width / 2},${height / 2})`);
 
-          const textSelection = svg.selectAll("text")
+          svg.selectAll("text")
             .data(words)
             .enter().append("text")
             .attr("class", "word-cloud-text select-none")
@@ -842,22 +690,20 @@
             .text(d => d.text)
             .on("click", (event, d) => {
               showToast(`'${d.text}' 은(는) 총 ${d.count}명이 선택했습니다!`, "📊");
-            });
-
-          // Animation entrance
-          textSelection
+            })
             .style("opacity", 0)
             .transition()
-            .duration(600)
-            .delay((d, i) => i * 40)
+            .duration(400)
+            .delay((d, i) => i * 20)
             .style("opacity", 1);
         }
-      }, 80);
+      }, 60);
     };
 
     function initQRCode(overrideUrl = null) {
       const qrContainer = document.getElementById('qrcode-container');
       const shareUrlInput = document.getElementById('share-url-input');
+      if (!qrContainer) return;
       qrContainer.innerHTML = '';
 
       let studentUrl = '';
@@ -866,51 +712,48 @@
         studentUrl = overrideUrl;
       } else {
         const cur = window.location.href;
-        // iFrame 또는 blob/about:blank 등 비공개 주소 감지
-        if (!cur || cur.startsWith('blob:') || cur.startsWith('about:') || cur.startsWith('file:') || cur.includes('localhost') || cur.includes('127.0.0.1')) {
-          studentUrl = 'https://your-github-username.github.io/wordcloud/?role=student';
+        if (!cur || cur.startsWith('blob:') || cur.startsWith('about:') || cur.startsWith('file:')) {
+          studentUrl = 'https://your-username.github.io/wordcloud/?role=student';
         } else {
           try {
             const urlObj = new URL(cur);
             urlObj.searchParams.set('role', 'student');
             studentUrl = urlObj.toString();
           } catch(e) {
-            studentUrl = 'https://your-github-username.github.io/wordcloud/?role=student';
+            studentUrl = cur + (cur.includes('?') ? '&' : '?') + 'role=student';
           }
         }
       }
 
-      shareUrlInput.value = studentUrl;
+      if (shareUrlInput) shareUrlInput.value = studentUrl;
 
-      // 1순위: QRCode.js 인스턴스 생성 시도
       try {
         if (typeof QRCode !== 'undefined') {
           new QRCode(qrContainer, {
             text: studentUrl,
-            width: 170,
-            height: 170,
-            colorDark: "#0f172a",
+            width: 165,
+            height: 165,
+            colorDark: "#090d16",
             colorLight: "#ffffff",
             correctLevel: QRCode.CorrectLevel.M
           });
           return;
         }
       } catch (err) {
-        console.warn("QRCode.js 생성 실패, 이미지 백업으로 전환:", err);
+        console.warn("QRCode.js note:", err);
       }
 
-      // 2순위 백업: QR Code 이미지 생성 API 폴백
       const encodedUrl = encodeURIComponent(studentUrl);
-      const fallbackImg = document.createElement('img');
-      fallbackImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=${encodedUrl}`;
-      fallbackImg.alt = "참여 QR 코드";
-      fallbackImg.className = "w-[170px] h-[170px] rounded-lg";
-      qrContainer.appendChild(fallbackImg);
+      const img = document.createElement('img');
+      img.src = `https://api.qrserver.com/v1/create-qr-code/?size=165x165&data=${encodedUrl}`;
+      img.alt = "참여 QR 코드";
+      img.className = "w-[165px] h-[165px] rounded-lg";
+      qrContainer.appendChild(img);
     }
 
     function promptCustomUrl() {
       const current = document.getElementById('share-url-input').value;
-      const custom = window.prompt("GitHub Pages 또는 배포된 웹사이트 주소를 입력하세요 (예: https://내아이디.github.io/폴더명/):", current);
+      const custom = window.prompt("GitHub Pages로 배포된 웹사이트 주소를 입력하세요 (예: https://내아이디.github.io/저장소명/):", current);
       if (custom && custom.trim() !== '') {
         let clean = custom.trim();
         try {
@@ -925,11 +768,12 @@
 
     function copyParticipantLink() {
       const input = document.getElementById('share-url-input');
+      if (!input) return;
       input.select();
       input.setSelectionRange(0, 99999);
       try {
         document.execCommand('copy');
-        showToast("참여 링크가 클립보드에 복사되었습니다!", "📋");
+        showToast("참여 링크가 복사되었습니다!", "📋");
       } catch (err) {
         showToast("링크를 수동으로 복사해주세요.", "⚠️");
       }
@@ -937,28 +781,57 @@
 
     function injectDemoResponses() {
       const sampleKeywords = [
-        "회의록 정리", "보고서 초안", "엑셀 데이터 취합", "이메일 답장", "문서 요약", 
+        "회의록 정리", "보고서 초안", "엑셀 데이터 취합", "이메일 답장", "문서 요약",
         "일정 조율", "고객 문의 응대", "영수증 경비정산", "시장 자료 조사", "번역 업무",
-        "단순 입력", "공지문 작성", "데이터 검증", "회의록 정리", "보고서 초안",
-        "엑셀 데이터 취합", "회의록 정리", "문서 요약", "보고서 초안", "단순 입력"
+        "단순 수치 입력", "공지문 작성", "데이터 검증", "회의록 정리", "보고서 초안",
+        "엑셀 데이터 취합", "회의록 정리", "문서 요약", "보고서 초안", "단순 수치 입력"
       ];
-
       sampleKeywords.forEach(kw => {
-        window.submitWordLocally(kw);
+        if (window.dbSubmitWord) {
+          window.dbSubmitWord(kw);
+        } else {
+          window.submitWordLocally(kw);
+        }
       });
-
-      showToast("부서 업무 관련 20명 분량의 예시 키워드가 입력되었습니다!", "✨");
+      showToast("20명 분량의 예시 키워드가 클라우드로 전송되었습니다!", "✨");
     }
 
     function resetAllDataConfirmation() {
-      if (window.confirm("모든 워드 클라우드 설문 데이터를 초기화하시겠습니까?")) {
+      if (window.confirm("모든 워드 클라우드 데이터를 초기화하시겠습니까?")) {
         if (window.dbResetAll) {
           window.dbResetAll();
         } else {
           window.appState.words = [];
           window.renderAllViews();
         }
-        showToast("데이터가 깨끗하게 초기화되었습니다.", "🗑️");
+        showToast("데이터가 초기화되었습니다.", "🗑️");
+      }
+    }
+
+    function switchView(view) {
+      window.appState.currentView = view;
+      const screenView = document.getElementById('view-screen');
+      const studentView = document.getElementById('view-student');
+      const btnScreen = document.getElementById('nav-screen-btn');
+      const btnStudent = document.getElementById('nav-student-btn');
+
+      if (!screenView || !studentView) return;
+
+      if (view === 'screen') {
+        screenView.classList.remove('hidden');
+        studentView.classList.add('hidden');
+        if (btnScreen) btnScreen.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-indigo-600 text-white shadow";
+        if (btnStudent) btnStudent.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 text-slate-300 hover:text-white";
+        setTimeout(() => window.renderWordCloud(), 80);
+      } else {
+        screenView.classList.add('hidden');
+        studentView.classList.remove('hidden');
+        if (btnStudent) btnStudent.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-indigo-600 text-white shadow";
+        if (btnScreen) btnScreen.className = "px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 text-slate-300 hover:text-white";
+        setTimeout(() => {
+          const input = document.getElementById('word-input');
+          if (input) input.focus();
+        }, 120);
       }
     }
 
@@ -982,14 +855,14 @@
       if (newDesc) window.appState.question.desc = newDesc;
       window.appState.colorTheme = newTheme;
 
-      window.updateQuestionUI();
-      if (window.dbUpdateConfig) {
-        window.dbUpdateConfig(newTitle, newDesc, newTheme);
-      }
+      document.getElementById('screen-question-title').textContent = window.appState.question.title;
+      document.getElementById('screen-question-desc').textContent = window.appState.question.desc;
+      document.getElementById('student-question-title').textContent = window.appState.question.title;
+      document.getElementById('student-question-desc').textContent = window.appState.question.desc;
 
       closeSettingsModal();
       window.renderWordCloud();
-      showToast("설문 설정이 성공적으로 저장되었습니다.", "💾");
+      showToast("설정이 저장되었습니다.", "💾");
     }
 
     function changeColorTheme(theme) {
@@ -997,19 +870,13 @@
       window.renderWordCloud();
     }
 
-    window.updateQuestionUI = function() {
-      document.getElementById('screen-question-title').textContent = window.appState.question.title;
-      document.getElementById('screen-question-desc').textContent = window.appState.question.desc;
-      document.getElementById('student-question-title').textContent = window.appState.question.title;
-      document.getElementById('student-question-desc').textContent = window.appState.question.desc;
-    };
-
     function updateMySubmissionsUI() {
       const container = document.getElementById('my-submissions-tags');
       const counter = document.getElementById('my-submit-count');
       const items = window.appState.localSubmissions;
 
-      counter.textContent = `총 ${items.length}개 제출`;
+      if (counter) counter.textContent = `총 ${items.length}개 제출`;
+      if (!container) return;
 
       if (items.length === 0) {
         container.innerHTML = '<span class="text-xs text-slate-600 italic">아직 제출한 단어가 없습니다.</span>';
@@ -1017,7 +884,7 @@
       }
 
       container.innerHTML = items.map(text => `
-        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
           # ${escapeHtml(text)}
         </span>
       `).join('');
@@ -1039,43 +906,46 @@
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.setAttribute("href", url);
-      link.setAttribute("download", `wordcloud_poll_${new Date().toISOString().slice(0, 10)}.csv`);
+      link.setAttribute("download", `wordcloud_${new Date().toISOString().slice(0, 10)}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast("CSV 다운로드가 완료되었습니다.", "📥");
+      showToast("CSV 다운로드 완료!", "📥");
     }
 
     function toggleFullScreen() {
       if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(err => {
-          showToast("전체화면 전환에 실패했습니다.", "⚠️");
-        });
+        document.documentElement.requestFullscreen().catch(() => {});
       } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        }
+        if (document.exitFullscreen) document.exitFullscreen();
       }
     }
 
     function showToast(message, icon = "✨") {
       const toast = document.getElementById('toast');
+      if (!toast) return;
       document.getElementById('toast-msg').textContent = message;
       document.getElementById('toast-icon').textContent = icon;
-
       toast.classList.remove('translate-y-24', 'opacity-0');
       toast.classList.add('translate-y-0', 'opacity-100');
-
       setTimeout(() => {
         toast.classList.remove('translate-y-0', 'opacity-100');
         toast.classList.add('translate-y-24', 'opacity-0');
-      }, 2500);
+      }, 2400);
     }
 
-    function escapeHtml(string) {
+    function escapeHtml(str) {
       const div = document.createElement('div');
-      div.innerText = string;
+      div.innerText = str;
       return div.innerHTML;
+    }
+
+    const wordInputEl = document.getElementById('word-input');
+    if (wordInputEl) {
+      wordInputEl.addEventListener('input', (e) => {
+        const counter = document.getElementById('char-counter');
+        if (counter) counter.textContent = `${e.target.value.length}/20`;
+      });
     }
 
     window.addEventListener('resize', () => {
@@ -1084,24 +954,16 @@
       }
     });
 
-    // Character counter for input
-    document.getElementById('word-input').addEventListener('input', function(e) {
-      document.getElementById('char-counter').textContent = `${e.target.value.length}/25`;
-    });
-
     window.onload = function() {
-      // 1. Initialize QR code
       initQRCode();
 
-      // 2. Check URL query params: if ?role=student, default to student view
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('role') === 'student' || urlParams.get('view') === 'student') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('role') === 'student' || params.get('view') === 'student') {
         switchView('student');
       } else {
         switchView('screen');
       }
 
-      // 3. Render initial views
       window.renderAllViews();
     };
   </script>
